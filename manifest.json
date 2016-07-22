@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+
+  "name": "Viz Contact plugin",
+  "description": "Data Mining of linkedin",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "logo.png",
+    "default_title": " Viz Link Extension",
+    "default_popup": "show.html"
+  },
+  "background": {
+    "persistent": true,
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [{
+    "matches":    ["https://linkedin.com/in/*","https://*.linkedin.com/*","https://pk.linkedin.com/in/*"],
+    "js":         ["content.js"],
+    "all_frames": true
+  }],
+  "permissions": [
+    "activeTab",
+    "tabs","https://linkedin.com/in/*","https://*.linkedin.com/*","https://pk.linkedin.com/in/*",
+    "http://fonts.googleapis.com/",
+    "https://fonts.googleapis.com/",
+    "http://localhost/cextension/response.php",
+    "http://localhost/sugarcrm/service/v4/rest.php?method=login&input_type=JSON&response_type=JSON&rest_data={\"user_auth\":{\"user_name\":\"admin\",\"password\":\"e10adc3949ba59abbe56e057f20f883e\",\"version\":\"1.0\"},\"application_name\":\"RestLogin\"}"
+  ]
+}
