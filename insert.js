@@ -4,7 +4,14 @@
 
 
 
-alert("this is inser.js file");
+chrome.extension.onRequest.addListener(
+    function (request, sender, sendResponse) {
+        if (request.greeting == "hello")
+            sendResponse({farewell: "goodbye"});
+    });
+
+
+//alert("this is inser.js file");
 
 //chrome.runtime.onMessage.addListener(function (msg) {
 //    if ((msg.from === 'content') && (msg.subject === 'showPageAction')) {

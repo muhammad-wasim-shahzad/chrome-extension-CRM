@@ -1,29 +1,41 @@
 {
   "manifest_version": 2,
-
-  "name": "Viz Contact plugin",
-  "description": "Data Mining of linkedin",
+  "name": "TO CRM Vizteck",
+  "description": "Socialality of linkedin meets CRM",
   "version": "1.0",
-
   "browser_action": {
-    "default_icon": "logo.png",
-    "default_title": " Viz Link Extension",
+    "default_icon": "kop.png",
+    "default_title": " To CRM",
     "default_popup": "show.html"
   },
   "background": {
     "persistent": true,
-    "scripts": ["background.js"]
+    "scripts": [
+      "background.js"
+    ]
   },
-  "content_scripts": [{
-    "matches":    ["https://linkedin.com/in/*","https://*.linkedin.com/*","https://pk.linkedin.com/in/*"],
-    "js":         ["content.js"],
-    "all_frames": true
-  }],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://linkedin.com/in/*",
+        "https://*.linkedin.com/*",
+        "https://pk.linkedin.com/in/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "all_frames": true
+    }
+  ],
   "permissions": [
     "activeTab",
-    "tabs","https://linkedin.com/in/*","https://*.linkedin.com/*","https://pk.linkedin.com/in/*",
+    "tabs",
+    "https://linkedin.com/in/*",
+    "https://*.linkedin.com/*",
+    "https://pk.linkedin.com/in/*",
     "http://fonts.googleapis.com/",
     "https://fonts.googleapis.com/",
+    "https://fonts.googleapis.com/css?family=Open+Sans:400,700",
     "http://localhost/cextension/response.php",
     "http://localhost/sugarcrm/service/v4/rest.php?method=login&input_type=JSON&response_type=JSON&rest_data={\"user_auth\":{\"user_name\":\"admin\",\"password\":\"e10adc3949ba59abbe56e057f20f883e\",\"version\":\"1.0\"},\"application_name\":\"RestLogin\"}"
   ]

@@ -9,6 +9,7 @@ var myURLStringArray;
 
 //set content to Extension html
 
+
 function setDOMInfo(info) {
 
 
@@ -18,7 +19,8 @@ function setDOMInfo(info) {
 
     document.getElementById('profession').textContent = info.profession;
 
-    document.getElementById('hidden_url').textContent=info.profile_url_encoded_string;
+    document.getElementById('hidden_url').textContent = info.profile_url_encoded_string;
+
 
     var x = document.createElement("img");
 
@@ -35,13 +37,25 @@ function setDOMInfo(info) {
     document.getElementById("image").appendChild(x);
 
 
+    var text = "<ul style='margin-top: 0;font-family: Open Sans;font-size: 13px;'>";
+    var i;
+    for (i = 0; i < info.skills.length; i++) {
+        text += "<li>" + info.skills[i] + "</li>";
+    }
+
+    text += "</ul>";
+
+    document.getElementById("skills").innerHTML = text;
+
+
 }
 
 //Send data to CRM
 
-function send_data() {
+function send_data(callback) {
 
     var session_id;
+    var insert_skills;
 
     var information = {};
     information.name = document.getElementById('name').textContent;
@@ -51,10 +65,20 @@ function send_data() {
     information.profession = document.getElementById('profession').textContent;
     information.pic = document.getElementById("linkedin_image").src;
 
-           information.hidden_url=document.getElementById('hidden_url').textContent;
+    information.hidden_url = document.getElementById('hidden_url').textContent;
 
+    information.skills = [];
 
+    insert_skills = document.getElementById("skills").getElementsByTagName("li");
 
+    console.log("insert-skills", insert_skills);
+    for (i = 0; i < insert_skills.length; i++) {
+        information.skills.push(insert_skills[i].innerText);
+        //console.log("first element",insert_skills[0]);
+
+    }
+    information.skills = information.skills.toString();
+    console.log("skills inserted in module", information.skills);
 
 
     var api_url = 'http://localhost/sugarcrm/service/v4/rest.php?method=login&input_type=JSON&response_type=JSON&rest_data={"user_auth":{"user_name":"admin","password":"e10adc3949ba59abbe56e057f20f883e","version":"1.0"},"application_name":"RestLogin"}';
@@ -79,67 +103,125 @@ function send_data() {
             var insert_account = document.getElementById('account');
             var insert_leads = document.getElementById('lead');
 
+            var whole_data = [];
+
+            var counter = 0;
+            if (insert_leads.checked) {
+                counter++;
+                var select_leads_params = {
+
+                    "session": session_id,
+                    "module_name": "Leads",
+                    "query": "website='" + information.hidden_url + "'",
+                    "order_by": "",
+                    "offset": 0,
+                    "select_fields": ["website"],
+                    "link_name_to_fields_array": [{
+                        "name": "email_addresses",
+                        "value": ["email_address", "opt_out", "primary_address"]
+                    }],
+
+                    "deleted": 0,
+                    "favorites": false
+
+                };
+                whole_data.push(select_leads_params);
+            }
+            if (insert_account.checked) {
+                counter++;
+                var select_leads_params = {
+
+                    "session": session_id,
+                    "module_name": "Accounts",
+                    "query": "profile_url_c='" + information.hidden_url + "'",
+                    "order_by": "",
+                    "offset": 0,
+                    "select_fields": ["profile_url_c"],
+                    "link_name_to_fields_array": [{
+                        "name": "email_addresses",
+                        "value": ["email_address", "opt_out", "primary_address"]
+                    }],
+
+                    "deleted": 0,
+                    "favorites": false
+
+                };
+                whole_data.push(select_leads_params);
+
+            }
+
+            if (insert_contact.checked) {
+                counter++;
+                var select_leads_params = {
+
+                    "session": session_id,
+                    "module_name": "Contacts",
+                    "query": "profile_url_c='" + information.hidden_url + "'",
+                    "order_by": "",
+                    "offset": 0,
+                    "select_fields": ["profile_url_c"],
+                    "link_name_to_fields_array": [{
+                        "name": "email_addresses",
+                        "value": ["email_address", "opt_out", "primary_address"]
+                    }],
+
+                    "deleted": 0,
+                    "favorites": false
+
+                };
+                whole_data.push(select_leads_params);
+
+            }
+
+            console.log("whole_data", whole_data);
+
+            whole_data.forEach(function (entry) {
+                console.log(entry);
 
 
-            var select_leads_params = {
+                var json_select_leads = JSON.stringify(entry);
 
-                "session": session_id,
-                "module_name": "Leads",
-                "query": "website='"+information.hidden_url+"'" ,
-                "order_by": "",
-                "offset": 0,
-                "select_fields": ["website"],
-                "link_name_to_fields_array": [{
-                    "name": "email_addresses",
-                    "value": ["email_address", "opt_out", "primary_address"]
-                }],
-
-                "deleted": 0,
-                "favorites": false
-
-            };
-            var json_select_leads=JSON.stringify(select_leads_params);
-
-            var fetching_url = "http://localhost/sugarcrm/service/v4/rest.php?method=get_entry_list&input_type=JSON&response_type=JSON&rest_data="+ json_select_leads;
+                var fetching_url = "http://localhost/sugarcrm/service/v4/rest.php?method=get_entry_list&input_type=JSON&response_type=JSON&rest_data=" + json_select_leads;
 
 
-            var http_fetched_leads = new XMLHttpRequest();
-            http_fetched_leads.open("GET",fetching_url, true);
+                var http_fetched_leads = new XMLHttpRequest();
+                http_fetched_leads.open("GET", fetching_url, true);
 
-            http_fetched_leads.onreadystatechange = function () {
-                if (http_fetched_leads.readyState == 4 && http_fetched_leads.status == 200) {
-                    var response = JSON.parse(http_fetched_leads.responseText);
+                http_fetched_leads.onreadystatechange = function () {
+                    if (http_fetched_leads.readyState == 4 && http_fetched_leads.status == 200) {
+                        var response = JSON.parse(http_fetched_leads.responseText);
 
-                    console.log(response);
-                   myURLStringArray = response.entry_list.length;
-                    console.log("entry list ",myURLStringArray);
+                        console.log("fetching service", response);
+                        myURLStringArray = response.entry_list.length;
+                        console.log("entry list ", myURLStringArray);
+                        document.cookie = "entry_list=" + myURLStringArray;
+                        if (myURLStringArray != 0) {
+                            callback();
+                        }
+                        if (entry.module_name == "Contacts" && myURLStringArray == 0) {
 
-                    if (insert_contact.checked) {
+                            insertContact();
+                        }
 
-                        insertContact();
+                        if (entry.module_name == "Accounts" && myURLStringArray == 0) {
+
+                            insertAccount();
+                        }
+                        console.log(myURLStringArray, insert_leads.checked);
+                        if (entry.module_name == "Leads" && myURLStringArray == 0) {
+                            console.log("skills inside rajni", information);
+
+                            insertLeads();
+                        }
+
+
                     }
-                    if (insert_account.checked) {
+                };
 
-                        insertAccount();
-                    }
-                    console.log(myURLStringArray,insert_leads.checked);
-                    if (insert_leads.checked && myURLStringArray==0) {
-
-                        insertLeads();
-                    }
-                    else
-                    {
-                        alert("Already in Sugar database");
-                        return false;
-                    }
+                http_fetched_leads.send('information=' + encodeURIComponent(json_select_leads));
 
 
-                }
-            };
-
-            http_fetched_leads.send('information=' + encodeURIComponent(json_select_leads));
-
-
+            });
 
 
         }
@@ -152,6 +234,7 @@ function send_data() {
 
     function insertContact() {
 
+        console.log("cont  goind to lead function");
 
         var insertion_data = {
             session: session_id,
@@ -178,7 +261,11 @@ function send_data() {
                 },
                 {
                     name: 'profile_url_c',
-                    value: hidden_url
+                    value: information.hidden_url
+                },
+                {
+                    name: 'skills_c',
+                    value: information.skills
                 }
 
 
@@ -210,6 +297,7 @@ function send_data() {
 //For Account Insertion
 
     function insertAccount() {
+        console.log("acc  goind to lead function");
 
 
         var insertion_data = {
@@ -237,7 +325,11 @@ function send_data() {
                 },
                 {
                     name: 'profile_url_c',
-                    value: hidden_url
+                    value: information.hidden_url
+                },
+                {
+                    name: 'skills_c',
+                    value: information.skills
                 }
 
 
@@ -271,9 +363,8 @@ function send_data() {
     function insertLeads() {
 
 
-
-alert("goind to lead function");
-        return false;
+        console.log("lead  goind to lead function");
+        console.log("skills inside lead", information);
 
         var insertion_data = {
             session: session_id,
@@ -301,11 +392,16 @@ alert("goind to lead function");
                 {
                     name: 'website',
                     value: information.hidden_url
+                },
+                {
+                    name: 'skills_area_c',
+                    value: information.skills.substring(0, 150)
                 }
 
 
             ]
 
+            //information.skills.substring(0,110)
 
         };
 
@@ -336,6 +432,9 @@ alert("goind to lead function");
 
 window.addEventListener('DOMContentLoaded', function () {
 
+    var cookie_entry_list = getCookie('entry_list');
+    //var cookie_entry_list = document.cookie;
+    console.log("entry list cookies", cookie_entry_list);
     var send = document.getElementById('send');
 
     //Check Box Validity
@@ -345,7 +444,25 @@ window.addEventListener('DOMContentLoaded', function () {
 
     send.addEventListener('click', function () {
         if (account_checkbox.checked || contact_checkbox.checked || lead_checkbox.checked) {
-            send_data();
+
+            send_data(function () {
+                chrome.tabs.query({
+                    active: true,
+                    currentWindow: true
+                }, function (tabs) {
+
+                    chrome.tabs.sendMessage(
+                        tabs[0].id,
+                        {from: 'popup', subject: 'cookie', entry: cookie_entry_list},
+
+                        setDOMInfo);
+                });
+
+
+                console.log("adnan");
+
+            });
+
         }
         else {
             alert("Please check at least one module");
@@ -360,11 +477,26 @@ window.addEventListener('DOMContentLoaded', function () {
 
         chrome.tabs.sendMessage(
             tabs[0].id,
-            {from: 'popup', subject: 'DOMInfo'},
+            {from: 'popup', subject: 'DOMInfo', entry: cookie_entry_list},
 
             setDOMInfo);
     });
+
+    delete_cookie('entry_list');
+
 });
 
 
+var delete_cookie = function (name) {
+    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};
 
+function getCookie(name) {
+    var pattern = RegExp(name + "=.[^;]*");
+    matched = document.cookie.match(pattern);
+    if (matched) {
+        var cookie = matched[0].split('=');
+        return cookie[1]
+    }
+    return false
+}
