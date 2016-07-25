@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link rel="stylesheet" type="text/css" href="show.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+
+
+    <script type="text/javascript" src="popup.js"></script>
+</head>
+
+<body>
+
+
+<h3 class="heading">Personal Info </h3>
+
+
+<table id="was_linkedin_info">
+
+    <tr>
+        <!--<td>Image</td>-->
+        <td colspan="2" align="right" style="text-align: center"><span id="image" class="img-circle"></span></td>
+    </tr>
+
+
+    <tr>
+        <td class="label-bold" style="padding-top: 5px">Name :</td>
+        <td align="right" class="data-right" style="padding-top: 5px"><span id="name">N/A</span></td>
+    </tr>
+
+    <tr>
+        <td class="label-bold">Location :</td>
+        <td align="right" class="data-right"><span id="location">N/A</span></td>
+    </tr>
+
+    <tr>
+        <td class="label-bold">Industry :</td>
+        <td align="right" class="data-right"><span id="profession">N/A</span></td>
+    </tr>
+
+
+</table>
+
+<div class="checkboxes">
+
+    <div class="set-check">
+        <input type="checkbox" name="account" id="account" value="account" class="checking">
+        <label for="account" class="lb-size">To Account</label>
+    </div>
+    <div class="set-check">
+        <input type="checkbox" name="contact" id="contact" value="contact" class="checking">
+        <label for="contact" class="lb-size">To Contact</label>
+    </div>
+    <div class="set-check">
+        <input type="checkbox" name="lead" id="lead" value="lead" class="checking">
+        <label for="lead" class="lb-size" style="padding-right: 4px;">To Lead</label>
+    </div>
+</div>
+<input type="hidden" id="hidden_url" name="hidden_url">
+
+<div style="text-align: center; width: inherit">
+    <button type="button" id="send" class="exp_button">Export to <span class="exp_button"
+                                                                       style="font-weight:700;">CRM</span></button>
+</div>
+
+</body>
+</html>
+
+
+
+
+
+
